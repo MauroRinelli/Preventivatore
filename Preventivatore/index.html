@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SoleBot – Preventivatore</title>
+<link rel="stylesheet" href="./css/style.css?v=3">
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sb" id="sidebar">
+    <div class="sb-header">
+      <img src="./media/solespress7272push.png" alt="Solespress" class="logo" />
+      <span class="brand">SoleBot</span>
+    </div>
+
+    <nav class="sb-nav">
+      <button class="sb-btn" data-target="italia">📦 Calcolo spedizione Italia</button>
+      <button class="sb-btn" data-target="europa">🚚 Calcolo spedizione Europa</button>
+      <button class="sb-btn" data-target="extraue">✈️ Calcolo spedizione Extra UE</button>
+      <button class="sb-btn" data-target="usa">🇺🇸 Calcolo spedizione USA</button>
+    </nav>
+
+    <div class="sb-footer">
+      <small>v0.2 • demo</small>
+    </div>
+  </aside>
+
+  <!-- OVERLAY mobile -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <header class="hero">
+      <button class="hamburger" id="hamburger" aria-label="Apri menu" aria-controls="sidebar" aria-expanded="false">
+        ☰
+      </button>
+      <h1>Preventivatore SoleBot</h1>
+      <p>Scrivi una richiesta oppure scegli un’opzione dalla sidebar.</p>
+    </header>
+
+    <section id="chatLog" class="chat-log" aria-live="polite"></section>
+
+    <div class="composer">
+      <textarea id="promptInput" rows="1" placeholder="Scrivi a SoleBot…  (Invio per inviare · Shift+Invio per a capo)"></textarea>
+      <button id="sendBtn" class="send">Invia</button>
+    </div>
+  </main>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>
