@@ -263,11 +263,14 @@ document.addEventListener("DOMContentLoaded", () => {
         formHTML = `
           <div class="quote-form">
             <div class="row">
-              <input id="cap" placeholder="CAP" inputmode="text" />
+              <input id="nazione" value="Italia" readonly style="background: #f0f0f0;" />
               <input id="citta" placeholder="Città" inputmode="text" />
             </div>
             <div class="row">
+              <input id="cap" placeholder="CAP" inputmode="text" />
               <input id="weight" placeholder="Peso (kg)" inputmode="decimal" />
+            </div>
+            <div class="row">
               <input id="len" placeholder="Lunghezza (cm)" inputmode="decimal" />
               <input id="wid" placeholder="Larghezza (cm)" inputmode="decimal" />
               <input id="hei" placeholder="Altezza (cm)" inputmode="decimal" />
@@ -281,14 +284,17 @@ document.addEventListener("DOMContentLoaded", () => {
         formHTML = `
           <div class="quote-form">
             <div class="row">
-              <input id="paese" placeholder="Paese di destinazione" inputmode="text" list="paesiEuropaList" />
+              <input id="nazione" placeholder="Nazione" inputmode="text" list="paesiEuropaList" autocomplete="off" />
               <input id="citta" placeholder="Città" inputmode="text" />
             </div>
             <datalist id="paesiEuropaList">
-              ${Object.values(paesiEuropa).flat().map(p => `<option value="${p}">`).join('')}
+              ${Object.values(paesiEuropa).flat().sort().map(p => `<option value="${p}">`).join('')}
             </datalist>
             <div class="row">
+              <input id="cap" placeholder="CAP/Codice Postale" inputmode="text" />
               <input id="weight" placeholder="Peso (kg)" inputmode="decimal" />
+            </div>
+            <div class="row">
               <input id="len" placeholder="Lunghezza (cm)" inputmode="decimal" />
               <input id="wid" placeholder="Larghezza (cm)" inputmode="decimal" />
               <input id="hei" placeholder="Altezza (cm)" inputmode="decimal" />
@@ -302,14 +308,17 @@ document.addEventListener("DOMContentLoaded", () => {
         formHTML = `
           <div class="quote-form">
             <div class="row">
-              <input id="paese" placeholder="Paese di destinazione" inputmode="text" list="paesiExtraUEList" />
+              <input id="nazione" placeholder="Nazione" inputmode="text" list="paesiExtraUEList" autocomplete="off" />
               <input id="citta" placeholder="Città" inputmode="text" />
             </div>
             <datalist id="paesiExtraUEList">
-              ${Object.values(zoneExtraUE).flat().map(p => `<option value="${p}">`).join('')}
+              ${Object.values(zoneExtraUE).flat().sort().map(p => `<option value="${p}">`).join('')}
             </datalist>
             <div class="row">
+              <input id="cap" placeholder="Codice Postale" inputmode="text" />
               <input id="weight" placeholder="Peso (kg)" inputmode="decimal" />
+            </div>
+            <div class="row">
               <input id="len" placeholder="Lunghezza (cm)" inputmode="decimal" />
               <input id="wid" placeholder="Larghezza (cm)" inputmode="decimal" />
               <input id="hei" placeholder="Altezza (cm)" inputmode="decimal" />
@@ -323,14 +332,17 @@ document.addEventListener("DOMContentLoaded", () => {
         formHTML = `
           <div class="quote-form">
             <div class="row">
-              <input id="citta" placeholder="Città/Stato USA" inputmode="text" list="cittaUSAList" />
-              <input id="zip" placeholder="ZIP Code" inputmode="text" />
+              <input id="nazione" value="USA" readonly style="background: #f0f0f0;" />
+              <input id="citta" placeholder="Città/Stato" inputmode="text" list="cittaUSAList" autocomplete="off" />
             </div>
             <datalist id="cittaUSAList">
-              ${Object.values(zoneUSA).flat().map(c => `<option value="${c}">`).join('')}
+              ${Object.values(zoneUSA).flat().sort().map(c => `<option value="${c}">`).join('')}
             </datalist>
             <div class="row">
+              <input id="zip" placeholder="ZIP Code" inputmode="text" />
               <input id="weight" placeholder="Peso (kg)" inputmode="decimal" />
+            </div>
+            <div class="row">
               <input id="len" placeholder="Lunghezza (cm)" inputmode="decimal" />
               <input id="wid" placeholder="Larghezza (cm)" inputmode="decimal" />
               <input id="hei" placeholder="Altezza (cm)" inputmode="decimal" />
@@ -398,17 +410,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       case "europa": {
-        const paese = $("#paese")?.value?.trim() || "";
+        const nazione = $("#nazione")?.value?.trim() || "";
         const citta = $("#citta")?.value?.trim() || "";
+        const cap = $("#cap")?.value?.trim() || "";
 
-        if (!paese) {
-          addMsg("assistant", "⚠️ Inserisci un paese valido!");
+        if (!nazione) {
+          addMsg("assistant", "⚠️ Inserisci una nazione valida!");
           return;
         }
 
-        const zona = getZonaEuropa(paese);
+        const zona = getZonaEuropa(nazione);
         if (!zona) {
-          addMsg("assistant", `⚠️ Paese "${paese}" non trovato nell'elenco Europa!`);
+          addMsg("assistant", `⚠️ Nazione "${nazione}" non trovata nell'elenco Europa!`);
           return;
         }
 
@@ -416,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const zonaNum = zona.replace("zona", "");
         risultato = `
           <strong>🚚 Preventivo Europa</strong><br>
-          • Destinazione: ${citta}, ${paese}<br>
+          • Destinazione: ${citta}${cap ? ` (${cap})` : ''}, ${nazione}<br>
           • Zona Europa: <strong>${zonaNum}</strong><br>
           • Peso reale: ${w.toFixed(2)} kg<br>
           • Peso volumetrico: ${vol.toFixed(2)} kg<br>
@@ -428,17 +441,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       case "extraue": {
-        const paese = $("#paese")?.value?.trim() || "";
+        const nazione = $("#nazione")?.value?.trim() || "";
         const citta = $("#citta")?.value?.trim() || "";
+        const cap = $("#cap")?.value?.trim() || "";
 
-        if (!paese) {
-          addMsg("assistant", "⚠️ Inserisci un paese valido!");
+        if (!nazione) {
+          addMsg("assistant", "⚠️ Inserisci una nazione valida!");
           return;
         }
 
-        const zona = getZonaExtraUE(paese);
+        const zona = getZonaExtraUE(nazione);
         if (!zona) {
-          addMsg("assistant", `⚠️ Paese "${paese}" non trovato nell'elenco Extra-UE!`);
+          addMsg("assistant", `⚠️ Nazione "${nazione}" non trovata nell'elenco Extra-UE!`);
           return;
         }
 
@@ -446,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const zonaNum = zona.replace("zona", "");
         risultato = `
           <strong>✈️ Preventivo Extra-UE</strong><br>
-          • Destinazione: ${citta}, ${paese}<br>
+          • Destinazione: ${citta}${cap ? ` (${cap})` : ''}, ${nazione}<br>
           • Zona Extra-UE: <strong>${zonaNum}</strong><br>
           • Peso reale: ${w.toFixed(2)} kg<br>
           • Peso volumetrico: ${vol.toFixed(2)} kg<br>
