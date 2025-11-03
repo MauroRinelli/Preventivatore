@@ -110,7 +110,7 @@ html, body {
   padding: 14px;
   overflow-y: auto;
   margin-top: -12px;
-  padding-top: 26px;
+  padding-top: 100px;
 }
 
 .msg{ display:flex; gap:12px; margin-bottom:12px; align-items:flex-start; }
