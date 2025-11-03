@@ -18,59 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentShippingType = "italia"; // Tipo di spedizione corrente
 
   // ===== Dati tariffe spedizioni =====
-
-  // Zone Italia (già implementate)
-  const zoneItaliaCAP = {
-    A: ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "50", "51", "52", "53", "54", "55", "56", "57", "59"],
-    B: ["58", "60", "61", "62", "63", "64", "65", "66", "67", "70", "71", "72", "73", "74", "75", "76", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89"],
-    C: ["90", "91", "92", "93", "94", "95", "96", "97", "98"]
-  };
-
-  // Paesi Europa (UE + alcuni extra-UE europei)
-  const paesiEuropa = {
-    // Europa Zona 1 (vicini, costi più bassi)
-    zona1: ["Austria", "Belgio", "Francia", "Germania", "Lussemburgo", "Paesi Bassi", "Slovenia"],
-    // Europa Zona 2 (UE centrale)
-    zona2: ["Danimarca", "Spagna", "Portogallo", "Croazia", "Repubblica Ceca", "Slovacchia", "Ungheria", "Polonia"],
-    // Europa Zona 3 (UE periferica + extra-UE europei)
-    zona3: ["Svezia", "Finlandia", "Estonia", "Lettonia", "Lituania", "Bulgaria", "Romania", "Grecia", "Irlanda", "Norvegia", "Svizzera", "Regno Unito"]
-  };
-
-  // Tariffe Europa per kg (esempio)
-  const tariffeEuropa = {
-    zona1: { base: 15, perKg: 2.5 },
-    zona2: { base: 20, perKg: 3.0 },
-    zona3: { base: 25, perKg: 3.5 }
-  };
-
-  // Zone Extra-UE (escluso USA)
-  const zoneExtraUE = {
-    zona1: ["Albania", "Bosnia-Erzegovina", "Macedonia del Nord", "Montenegro", "Serbia", "Turchia"],
-    zona2: ["Russia", "Ucraina", "Bielorussia", "Moldavia"],
-    zona3: ["Cina", "Giappone", "Corea del Sud", "India", "Thailandia", "Singapore", "Australia", "Nuova Zelanda"],
-    zona4: ["Brasile", "Argentina", "Cile", "Messico", "Canada", "Sud Africa", "Emirati Arabi Uniti", "Arabia Saudita"]
-  };
-
-  // Tariffe Extra-UE per kg
-  const tariffeExtraUE = {
-    zona1: { base: 30, perKg: 4.0 },
-    zona2: { base: 40, perKg: 5.0 },
-    zona3: { base: 50, perKg: 6.5 },
-    zona4: { base: 45, perKg: 6.0 }
-  };
-
-  // Tariffe USA (3 zone)
-  const zoneUSA = {
-    zona1: ["East Coast", "New York", "Boston", "Philadelphia", "Washington DC", "Miami", "Atlanta"],
-    zona2: ["Central", "Chicago", "Dallas", "Houston", "Minneapolis", "Detroit"],
-    zona3: ["West Coast", "Los Angeles", "San Francisco", "Seattle", "San Diego", "Las Vegas"]
-  };
-
-  const tariffeUSA = {
-    zona1: { base: 45, perKg: 7.0 },
-    zona2: { base: 50, perKg: 7.5 },
-    zona3: { base: 55, perKg: 8.0 }
-  };
+  // NOTA: Zone, paesi e tariffe sono definiti in listini.js
+  // Le funzioni di calcolo utilizzano i listini professionali importati
 
   // ===== Mobile sidebar toggle =====
   function toggleSidebar(open) {
@@ -177,74 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
     addMsg("assistant", "✅ Chat azzerata. Puoi ripartire con un nuovo preventivo.");
   }
 
-  // ===== Helper: determinare zona spedizione =====
-
-  function getZonaItalia(cap) {
-    const prefix = cap.substring(0, 2);
-    if (zoneItaliaCAP.A.includes(prefix)) return "A";
-    if (zoneItaliaCAP.B.includes(prefix)) return "B";
-    if (zoneItaliaCAP.C.includes(prefix)) return "C";
-    return null;
-  }
-
-  function getZonaEuropa(paese) {
-    for (const [zona, paesi] of Object.entries(paesiEuropa)) {
-      if (paesi.some(p => paese.toLowerCase().includes(p.toLowerCase()) || p.toLowerCase().includes(paese.toLowerCase()))) {
-        return zona;
-      }
-    }
-    return null;
-  }
-
-  function getZonaExtraUE(paese) {
-    for (const [zona, paesi] of Object.entries(zoneExtraUE)) {
-      if (paesi.some(p => paese.toLowerCase().includes(p.toLowerCase()) || p.toLowerCase().includes(paese.toLowerCase()))) {
-        return zona;
-      }
-    }
-    return null;
-  }
-
-  function getZonaUSA(citta) {
-    for (const [zona, citta_list] of Object.entries(zoneUSA)) {
-      if (citta_list.some(c => citta.toLowerCase().includes(c.toLowerCase()) || c.toLowerCase().includes(citta.toLowerCase()))) {
-        return zona;
-      }
-    }
-    return "zona2"; // default centrale
-  }
-
-  // ===== Calcolo tariffe =====
-
-  function calcolaTariffaItalia(peso, zona) {
-    // Tariffe semplificate Italia
-    const tariffe = {
-      A: { base: 8, perKg: 1.0 },
-      B: { base: 10, perKg: 1.5 },
-      C: { base: 15, perKg: 2.5 }
-    };
-    const tariffa = tariffe[zona];
-    if (!tariffa) return 0;
-    return tariffa.base + Math.max(0, peso - 1) * tariffa.perKg;
-  }
-
-  function calcolaTariffaEuropa(peso, zona) {
-    const tariffa = tariffeEuropa[zona];
-    if (!tariffa) return 0;
-    return tariffa.base + Math.max(0, peso - 1) * tariffa.perKg;
-  }
-
-  function calcolaTariffaExtraUE(peso, zona) {
-    const tariffa = tariffeExtraUE[zona];
-    if (!tariffa) return 0;
-    return tariffa.base + Math.max(0, peso - 1) * tariffa.perKg;
-  }
-
-  function calcolaTariffaUSA(peso, zona) {
-    const tariffa = tariffeUSA[zona];
-    if (!tariffa) return 0;
-    return tariffa.base + Math.max(0, peso - 1) * tariffa.perKg;
-  }
+  // ===== Funzioni helper e calcolo tariffe =====
+  // NOTA: Tutte le funzioni di calcolo (getZonaItalia, calcolaPrezzoItalia, ecc.)
+  // sono importate da listini.js
 
   // ===== Demo: form preventivo =====
   function renderQuoteForm(type = "italia") {
@@ -395,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        const price = calcolaTariffaItalia(kg, zona);
+        const price = calcolaPrezzoItalia(kg, zona);
         risultato = `
           <strong>📦 Preventivo Italia</strong><br>
           • Destinazione: ${citta} (${cap})<br>
@@ -425,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        const price = calcolaTariffaEuropa(kg, zona);
+        const price = calcolaPrezzoEuropa(kg, zona);
         const zonaNum = zona.replace("zona", "");
         risultato = `
           <strong>🚚 Preventivo Europa</strong><br>
@@ -456,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        const price = calcolaTariffaExtraUE(kg, zona);
+        const price = calcolaPrezzoExtraUE(kg, zona);
         const zonaNum = zona.replace("zona", "");
         risultato = `
           <strong>✈️ Preventivo Extra-UE</strong><br>
@@ -481,7 +365,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const zona = getZonaUSA(citta);
-        const price = calcolaTariffaUSA(kg, zona);
+        const price = calcolaPrezzoUSA(kg, zona);
         const zonaNum = zona.replace("zona", "");
         risultato = `
           <strong>🇺🇸 Preventivo USA</strong><br>
