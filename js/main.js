@@ -419,6 +419,11 @@ document.addEventListener("DOMContentLoaded", () => {
     b.addEventListener("click", () => {
       const targetType = b.getAttribute("data-target");
       toggleSidebar(false);
+
+      // Reset della chat per evitare maschere multiple
+      if (chat) chat.innerHTML = "";
+      setLocked(false);
+
       renderQuoteForm(targetType);
     });
   });
